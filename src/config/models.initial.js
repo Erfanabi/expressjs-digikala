@@ -1,10 +1,10 @@
+const sequelize = require("./sequelize.config");
 const {
   Product,
   ProductDetail,
   ProductColor,
   ProductSize,
-} = require("/src/modules/product/product.model");
-const sequelize = require("./sequelize.config"); // مسیر مدل‌ها را تنظیم کنید
+} = require("../modules/product/product.model"); // مسیر مدل‌ها را تنظیم کنید
 
 async function initDatabase() {
   // یک محصول چند جزئیات دارد
@@ -43,7 +43,7 @@ async function initDatabase() {
     as: "product",
   });
 
-  await sequelize.sync({ alter: true });
+  await sequelize.sync({ force: true });
 }
 
 module.exports = initDatabase;

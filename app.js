@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const initDatabase = require("./src/config/models.initial");
 const mainRouter = require("./src/app.routes");
 
 dotenv.config();
@@ -11,6 +12,8 @@ async function main() {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  await initDatabase();
 
   app.use(mainRouter);
 

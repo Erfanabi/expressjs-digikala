@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  logging: process.env.NODE_ENV === "development" ? console.log : false, // لاگ SQL در محیط توسعه
+  logging: process.env.NODE_ENV === "development" ? false : false, // لاگ SQL در محیط توسعه
 });
 
 sequelize
