@@ -5,6 +5,9 @@ dotenv.config();
 
 async function main() {
   const app = express();
+
+  require("./config/sequelize.config");
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
