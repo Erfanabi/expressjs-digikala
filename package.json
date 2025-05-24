@@ -13,6 +13,8 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-validation": "^4.1.1",
+    "http-errors": "^2.0.0",
     "mysql2": "^3.14.1",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",

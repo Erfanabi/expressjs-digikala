@@ -24,6 +24,7 @@ const Product = sequelize.define(
     updatedAt: "updated_at",
   },
 );
+
 const ProductDetail = sequelize.define(
   "product_detail",
   {
@@ -37,6 +38,7 @@ const ProductDetail = sequelize.define(
     modelName: "product_detail",
   },
 );
+
 const ProductColor = sequelize.define(
   "product_color",
   {
@@ -54,6 +56,7 @@ const ProductColor = sequelize.define(
     modelName: "product_color",
   },
 );
+
 const ProductSize = sequelize.define(
   "product_size",
   {
