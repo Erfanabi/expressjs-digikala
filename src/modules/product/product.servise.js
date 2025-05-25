@@ -1,6 +1,11 @@
 const createHttpError = require("http-errors");
 const { ProductTypes } = require("../../common/constant/product.const");
-const { ProductDetail, ProductColor, ProductSize } = require("./product.model");
+const {
+  ProductDetail,
+  ProductColor,
+  ProductSize,
+  Product,
+} = require("./product.model");
 
 async function createProductHandler(req, res, next) {
   try {
