@@ -100,4 +100,71 @@ async function createProductHandler(req, res, next) {
   }
 }
 
-module.exports = { createProductHandler };
+async function getProductsHandler(req, res, next) {
+  try {
+    const products = await Product.findAll({});
+    return res.json({
+      products,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getProductDetailByIdHandler(req, res, next) {
+  try {
+    const productId = req.params.id;
+
+    if (!productId || isNaN(productId)) {
+      throw createHttpError(400, "Invalid product ID");
+    }
+
+    console.log(productId);
+
+    const product = await Product.findOne({
+      where: {
+        id: productId,
+      },
+      include: [
+        {
+          model: ProductDetail,
+          as: "details",
+          attributes: ["key", "value"],
+        },
+        {
+          model: ProductColor,
+          as: "colors",
+          attributes: [
+            "color_name",
+            "color_code",
+            "count",
+            "price",
+            "discount",
+            "active_discount",
+          ],
+        },
+        {
+          model: ProductSize,
+          as: "sizes",
+          attributes: ["size", "count", "price", "discount", "active_discount"],
+        },
+      ],
+    });
+
+    console.log(product);
+
+    if (!product) throw createHttpError(404, "not found product");
+
+    return res.json({
+      product,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = {
+  createProductHandler,
+  getProductsHandler,
+  getProductDetailByIdHandler,
+};

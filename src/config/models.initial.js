@@ -43,7 +43,7 @@ async function initDatabase() {
     as: "product",
   });
 
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ alter: true });
 }
 
 module.exports = initDatabase;
