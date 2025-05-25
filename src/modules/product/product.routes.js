@@ -4,6 +4,7 @@ const {
   createProductHandler,
   getProductsHandler,
   getProductDetailByIdHandler,
+  removeProductHandler,
 } = require("./product.servise");
 
 const router = Router();
@@ -11,6 +12,7 @@ const router = Router();
 router.post("/", createProductValidation, createProductHandler);
 router.get("/", getProductsHandler);
 router.get("/:id", getProductDetailByIdHandler);
+router.delete("/:id", removeProductHandler);
 
 module.exports = {
   productRoutes: router,

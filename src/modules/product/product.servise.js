@@ -163,8 +163,35 @@ async function getProductDetailByIdHandler(req, res, next) {
   }
 }
 
+async function removeProductHandler(req, res, next) {
+  try {
+    const productId = req.params.id;
+
+    if (!productId || isNaN(productId)) {
+      throw createHttpError(400, "Invalid product ID");
+    }
+
+    // اول بررسی می‌کنیم محصول وجود دارد یا خیر
+    const product = await Product.findByPk(productId);
+    if (!product) throw createHttpError(404, "not found product");
+
+    // // حذف داده‌های مرتبط
+    // await ProductDetail.destroy({ where: { productId } });
+    // await ProductColor.destroy({ where: { productId } });
+    // await ProductSize.destroy({ where: { productId } });
+
+    // حذف خود محصول
+    await product.destroy();
+
+    return res.json({ message: "Product removed successfully" });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createProductHandler,
   getProductsHandler,
   getProductDetailByIdHandler,
+  removeProductHandler,
 };
