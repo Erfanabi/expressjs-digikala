@@ -4,7 +4,8 @@ const {
   ProductDetail,
   ProductColor,
   ProductSize,
-} = require("../modules/product/product.model"); // مسیر مدل‌ها را تنظیم کنید
+} = require("../modules/product/product.model");
+const { User, Otp } = require("../modules/user/user.model"); // مسیر مدل‌ها را تنظیم کنید
 
 async function initDatabase() {
   // یک محصول چند جزئیات دارد
@@ -42,6 +43,12 @@ async function initDatabase() {
     targetKey: "id",
     as: "product",
   });
+
+  // هر کاربر یک OTP داره
+  User.hasOne(Otp, { foreignKey: "userId", sourceKey: "id", as: "otp" });
+
+  // هر OTP متعلق به یک کاربر است
+  Otp.belongsTo(User, { foreignKey: "userId", targetKey: "id", as: "user" });
 
   await sequelize.sync({ alter: true });
 }

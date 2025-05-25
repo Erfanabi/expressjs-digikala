@@ -5,7 +5,7 @@ const {
   getProductsHandler,
   getProductDetailByIdHandler,
   removeProductHandler,
-} = require("./product.servise");
+} = require("./product.service");
 
 const router = Router();
 
