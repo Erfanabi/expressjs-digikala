@@ -1,5 +1,7 @@
 const createHttpError = require("http-errors");
 const { User, Otp } = require("../user/user.model");
+const jwt = require("jsonwebtoken");
+const { RefreshToken } = require("../user/refreshToken.model");
 
 async function sendOtpHandler(req, res, next) {
   try {
@@ -73,17 +75,75 @@ async function checkOtpHandler(req, res, next) {
       throw createHttpError(401, "otp code is expired");
     }
 
+    const { accessToken, refreshToken } = generateTokens({ user });
+
     return res.json({
       message: "logged-in successfully",
-      // accessToken,
-      // refreshToken
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     next(error);
   }
 }
 
+async function verifyRefreshTokenHandler(req, res, next) {
+  try {
+    const { refreshToken: token } = req.body;
+
+    if (!token) {
+      return createHttpError(401, "refreshToken is required");
+    }
+
+    const verified = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+
+    if (verified?.user?.id) {
+      const user = await User.findByPk(verified?.user?.id);
+      if (!user) throw createHttpError(401, "login on your account");
+
+      const existToken = await RefreshToken.findOne({
+        where: {
+          token,
+        },
+      });
+      if (existToken) throw createHttpError(401, "token expired");
+
+      await RefreshToken.create({
+        token,
+        userId: user.id,
+      });
+
+      const { accessToken, refreshToken } = generateTokens({ user });
+
+      return res.json({
+        accessToken,
+        refreshToken,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
+function generateTokens(payload) {
+  const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
+
+  const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+    expiresIn: "1d",
+  });
+
+  const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+    expiresIn: "10d",
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+}
+
 module.exports = {
   sendOtpHandler,
   checkOtpHandler,
+  verifyRefreshTokenHandler,
 };
