@@ -14,7 +14,6 @@ async function AuthGuard(req, res, next) {
     }
 
     const verified = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(verified);
     if (verified?.user?.id) {
       const user = await User.findByPk(verified?.user?.id);
       if (!user) throw createHttpError(401, "login on your account");
