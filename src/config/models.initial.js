@@ -8,6 +8,8 @@ const {
 const { User, Otp } = require("../modules/user/user.model");
 const { Basket } = require("../modules/basket/basket.model");
 const { Discount } = require("../modules/discount/discount.model");
+const { Order, OrderItems } = require("../modules/order/order.model");
+const { Payment } = require("../modules/payment/payment.model");
 
 async function initDatabase() {
   // یک محصول چند جزئیات دارد
@@ -99,6 +101,40 @@ async function initDatabase() {
     targetKey: "id",
     as: "discount",
   });
+
+  // یک سفارش می‌تواند شامل چندین آیتم (محصول) باشد.
+  Order.hasMany(OrderItems, {
+    foreignKey: "orderId",
+    sourceKey: "id",
+    as: "items",
+  });
+  OrderItems.belongsTo(Order, {
+    foreignKey: "orderId",
+    targetKey: "id",
+    as: "orders",
+  });
+
+  // یک سفارش تنها می‌تواند یک پرداخت مرتبط با خود داشته باشد.
+  Order.hasOne(Payment, {
+    foreignKey: "orderId",
+    sourceKey: "id",
+    as: "payment",
+  });
+  Payment.belongsTo(Order, {
+    foreignKey: "orderId",
+    targetKey: "id",
+    as: "order",
+  });
+
+  // یک کاربر می‌تواند چند سفارش داشته باشد.
+  User.hasMany(Order, {
+    foreignKey: "userId",
+    sourceKey: "id",
+    as: "orders",
+  });
+
+  // یک سفارش متعلق به یک کاربر است.
+  Order.belongsTo(User, { foreignKey: "userId", targetKey: "id", as: "user" });
 
   await sequelize.sync({ alter: true });
 }
