@@ -101,6 +101,93 @@ async function addToBasketHandler(req, res, next) {
   }
 }
 
+async function getUserBasketHandler(req, res, next) {
+  try {
+    const { id: userId = undefined } = req.user ?? {};
+
+    const basketItems = await Basket.findAll({
+      where: { userId },
+      include: [
+        { model: Product, as: "product" },
+        { model: ProductColor, as: "color" },
+        { model: ProductSize, as: "size" },
+      ],
+    });
+
+    // محاسبه اطلاعات کلی سبد خرید
+    let totalPrice = 0;
+    let totalDiscountedPrice = 0;
+    let totalItems = 0;
+
+    // تبدیل آیتم‌های سبد خرید به ساختار بهینه
+    const items = basketItems.map(item => {
+      const basePrice = item.color?.price || item.size?.price || item.product.price;
+      const discount = item.color?.active_discount ? item.color.discount : 
+                      (item.product.active_discount ? item.product.discount : 0);
+      
+      const itemPrice = Number(basePrice) * item.count;
+      const itemDiscountedPrice = itemPrice * (1 - (discount / 100));
+
+      totalPrice += itemPrice;
+      totalDiscountedPrice += itemDiscountedPrice;
+      totalItems += item.count;
+
+      return {
+        basketItemId: item.id,
+        product: {
+          id: item.product.id,
+          title: item.product.title,
+          description: item.product.description,
+          type: item.product.type
+        },
+        variant: {
+          type: item.color ? 'color' : (item.size ? 'size' : 'normal'),
+          ...(item.color && {
+            color: {
+              name: item.color.color_name,
+              code: item.color.color_code
+            }
+          }),
+          ...(item.size && {
+            size: {
+              id: item.size.id,
+              name: item.size.size_name
+            }
+          })
+        },
+        pricing: {
+          originalPrice: Number(basePrice),
+          discount: discount,
+          finalPrice: Number(basePrice) * (1 - (discount / 100)),
+          totalPrice: itemPrice,
+          totalDiscountedPrice: itemDiscountedPrice
+        },
+        inventory: {
+          count: item.count,
+          availableStock: item.color?.count || item.size?.count || item.product.count
+        }
+      };
+    });
+
+    return res.json({
+      status: "success",
+      message: "سبد خرید با موفقیت دریافت شد",
+      data: {
+        summary: {
+          totalItems,
+          totalPrice,
+          totalDiscountedPrice,
+          totalDiscount: totalPrice - totalDiscountedPrice
+        },
+        items
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   addToBasketHandler,
+  getUserBasketHandler,
 };

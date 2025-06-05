@@ -26,7 +26,7 @@ async function AuthGuard(req, res, next) {
       next();
     }
 
-    throw createHttpError(401, "login on your account");
+    // throw createHttpError(401, "login on your account");
   } catch (error) {
     next(error);
   }
